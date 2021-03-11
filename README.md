@@ -12,9 +12,9 @@ My name is Arghya. I'm an undergrad at the University of Washington. I’m curre
 
 Email: **[arghyak@uw.edu](arghyak@uw.edu "UW Email")**
 
-Linkedin: ***[arghya-k](https://www.linkedin.com/in/arghya-k/)***
+Linkedin: **[arghya-k](https://www.linkedin.com/in/arghya-k/)**
 
-Website: *[Saffron & Sunlight](https://saffronandsunlight.wordpress.com/ "Writing Portfolio")*
+Website: **[Saffron & Sunlight](https://saffronandsunlight.wordpress.com/ "Writing Portfolio")**
 
 ---
 
