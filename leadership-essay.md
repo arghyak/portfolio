@@ -29,6 +29,10 @@ My inspiration for leading Plenum and founding GeoDat is my dance teacher, Srima
 
 As a senior student in the Academy, I’ve had the opportunity to take on leadership roles in all three organizations: as an instructor in the Academy, Project Manager in AKDC, and Board Treasurer in AWB. My experiences from these roles have increased my capacity for leadership and catalyzed my journey as a more compassionate and effective leader.
 
+<div class="image" markdown="1">
+<img src="imgs/kathak-zoom-class.png" alt="Dance Class on Zoom">
+</div>
+
 ![Dance Class on Zoom](imgs/kathak-zoom-class.png "Dance Class on Zoom")
 
 ## Leadership Growth through the Arts
