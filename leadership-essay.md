@@ -29,6 +29,8 @@ My inspiration for leading Plenum and founding GeoDat is my dance teacher, Srima
 
 As a senior student in the Academy, I’ve had the opportunity to take on leadership roles in all three organizations: as an instructor in the Academy, Project Manager in AKDC, and Board Treasurer in AWB. My experiences from these roles have increased my capacity for leadership and catalyzed my journey as a more compassionate and effective leader.
 
+![Dance Class on Zoom](imgs/kathak-zoom-class.png "Dance Class on Zoom")
+
 ## Leadership Growth through the Arts
 
 As an Academy instructor, I learned servant leadership. Whether I am preparing students for exams or performances, I never let the stress of deadlines detract from my focus on students’ individual growth as dancers. To help them absorb material, I incorporate games and challenges into their learning. It requires extra time and organization effort, but it is well worth the positive impact on their learning and cohesion as a class. I bring that same attitude to serving the members of GeoDat and Plenum. Although GeoDat’s primary function is research, organizing our events will be equally important. They’ll allow us to reach more tech and Geography students and help bring us all together. This experience has also inspired me to develop a Virtual Study Center for Geography students through Plenum, in order to foster UW’s undergraduate Geography community while campus remains virtual.
