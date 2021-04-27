@@ -37,7 +37,7 @@ On The Inequity of Microtargeting and Political Manipulation.
 
 ---
 
-## Coding Projects
+## Technical Projects
 
 Geographic Information Systems
 
@@ -47,9 +47,10 @@ Data Programming
 
 * link
 
-Database Development
+Databases
 
-* link
+* ***[Backend Database Prototype for Clinic Appointments Administration Application](database-development/clinic-admin-application-backend/README.md)***
+* ***[Database Administration Workflow](database-development/database-administration/README.md)***
 
 Neural Coding
 
