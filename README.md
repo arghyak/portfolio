@@ -30,8 +30,8 @@ Data Programming
 
 Databases
 
-* ***[Backend Database Prototype for Clinic Appointments Administration Application](database-development/clinic-admin-application-backend/README.md)***
-* ***[Database Administration Workflow](database-development/database-administration/README.md)***
+* ***[Backend Database Prototype for Clinic Appointments Administration Application](database-development/clinic-admin-application-backend)***
+* ***[Database Administration Workflow](database-development/database-administration)***
 
 Neural Coding
 
