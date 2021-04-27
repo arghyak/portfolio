@@ -1,0 +1,964 @@
+--**********************************************************************************************--
+-- Title: INFO 330 Final Milestone 02
+-- Author: AKannadaguli
+-- Desc: Implements prototype database for Patient Appointment Application
+-- Change Log: When,Who,What
+-- 2020-06-11,AKannadaguli,Created File
+--***********************************************************************************************--
+
+-------------------------------------- NOTE FROM THE AUTHOR ---------------------------------------
+-- This script does the following:
+  -- Create Tables
+  -- Add Constraints
+  -- Create Views
+  -- Create 1 Reporting View
+  -- Create Stored Procedures
+  -- Test Stored Procedures
+  -- Set Public Permissions for Database Entities
+
+-- When this script runs, it will output test results (feedback and the appropriate
+-- updated Table) for the following Sprocs in this order:
+  -- pInsClinics
+  -- pInsPatients
+  -- pInsDoctors
+  -- pInsAppointments
+  -- pUpdClinics
+  -- pUpdPatients
+  -- pUpdDoctors
+  -- pUpdAppointments
+  -- pDelAppointments
+  -- pDelClinics
+  -- pDelPatients
+  -- pDelDoctors
+---------------------------------------------------------------------------------------------------
+
+
+Begin Try
+	Use Master;
+	If Exists(Select Name From SysDatabases Where Name = 'Assignment08DB_AKannadaguli')
+	 Begin 
+	  Alter Database [Assignment08DB_AKannadaguli] set Single_user With Rollback Immediate;
+	  Drop Database Assignment08DB_AKannadaguli;
+	 End
+	Create Database Assignment08DB_AKannadaguli;
+End Try
+Begin Catch
+	Print Error_Number();
+End Catch
+go
+Use Assignment08DB_AKannadaguli;
+go
+
+-- CREATE TABLES ----------------------------------------------------------------------------------
+
+-- Clinics Table
+Create Table Clinics(
+  ClinicID int Identity(1,1)
+  ,ClinicName nVarchar(100) not null
+  ,ClinicPhoneNumber nVarchar(100) not null
+  ,ClinicAddress nVarchar(100) not null
+  ,ClinicCity nVarchar(100) not null
+  ,ClinicState nchar(2) not null
+  ,ClinicZipCode nVarchar(10) not null
+);
+go
+
+-- Patients Table
+Create Table Patients(
+  PatientID int not null Identity(1,1)
+  ,PatientFirstName nVarchar(100) not null
+  ,PatientLastName nVarchar(100) not null
+  ,PatientPhoneNumber nVarchar(100) not null
+  ,PatientAddress nVarchar(100) not null
+  ,PatientCity nVarchar(100) not null
+  ,PatientState nchar(2) not null
+  ,PatientZipCode nVarchar(10) not null
+);
+go
+
+-- Doctors Table
+Create Table Doctors(
+  DoctorID int Identity(1,1)
+  ,DoctorFirstName nVarchar(100) not null
+  ,DoctorLastName nVarchar(100) not null
+  ,DoctorPhoneNumber nVarchar(100) not null
+  ,DoctorAddress nVarchar(100) not null
+  ,DoctorCity nVarchar(100) not null
+  ,DoctorState nchar(2) not null
+  ,DoctorZipCode nVarchar(10) not null
+);
+go
+
+-- Appointments Table
+Create Table Appointments(
+  AppointmentID int Identity(1,1)
+  ,AppointmentDateTime datetime not null
+  ,AppointmentPatientID int not null
+  ,AppointmentDoctorID int not null
+  ,AppointmentClinicID int not null
+);
+go
+
+-- ADD CONSTRAINTS --------------------------------------------------------------------------------
+
+-- Clinics Table
+Alter Table Clinics With Check Add
+  Constraint pkClinics Primary Key (ClinicID)
+  ,Constraint uqClinicName Unique (ClinicName)
+  ,Constraint ckClinicPhoneNumber Check (ClinicPhoneNumber like '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
+  ,Constraint ckClinicZipCode Check (ClinicZipCode like '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
+                                     or ClinicZipCode like '[0-9][0-9][0-9][0-9][0-9]')
+;
+go
+
+-- Patients Table
+Alter Table Patients With Check Add
+  Constraint pkPatients Primary Key (PatientID)
+  ,Constraint ckPatientPhoneNumber Check (PatientPhoneNumber like '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
+  ,Constraint ckPatientZipCode Check (PatientZipCode like '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
+                                     or PatientZipCode like '[0-9][0-9][0-9][0-9][0-9]')
+;
+go
+
+-- Doctors Table
+Alter Table Doctors With Check Add
+  Constraint pkDoctors Primary Key (DoctorID)
+  ,Constraint ckDoctorPhoneNumber Check (DoctorPhoneNumber like '[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
+  ,Constraint ckDoctorZipCode Check (DoctorZipCode like '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]'
+                                     or DoctorZipCode like '[0-9][0-9][0-9][0-9][0-9]')
+;
+go
+
+-- Appointments Table
+Alter Table Appointments With Check Add
+  Constraint pkAppointments Primary Key (AppointmentID)
+  ,Constraint fkAppointmentPatientID Foreign Key (AppointmentPatientID) References Patients(PatientID)
+  ,Constraint fkAppointmentDoctorID Foreign Key (AppointmentDoctorID) References Doctors(DoctorID)
+  ,Constraint fkAppointmentClinicID Foreign Key (AppointmentClinicID) References Clinics(ClinicID)
+;
+go
+
+-- Test Tables and Constraints
+/*
+sp_help Clinics;
+go
+sp_help Patients;
+go
+sp_help Doctors;
+go
+sp_help Appointments;
+go
+*/
+
+-- CREATE VIEWS -----------------------------------------------------------------------------------
+
+-- Clinics View
+Create View vClinics As
+Select
+  ClinicID
+  ,ClinicName
+  ,ClinicPhoneNumber
+  ,ClinicAddress
+  ,ClinicCity
+  ,ClinicState
+  ,ClinicZipCode
+From Clinics;
+go
+
+-- Patients View
+Create View vPatients As
+Select
+  PatientID
+  ,PatientFirstName
+  ,PatientLastName
+  ,PatientPhoneNumber
+  ,PatientAddress
+  ,PatientCity
+  ,PatientState
+  ,PatientZipCode
+From Patients;
+go
+
+-- Doctors View
+Create View vDoctors As
+Select
+  DoctorID
+  ,DoctorFirstName
+  ,DoctorLastName
+  ,DoctorPhoneNumber
+  ,DoctorAddress
+  ,DoctorCity
+  ,DoctorState
+  ,DoctorZipCode
+From Doctors;
+go
+
+-- Appointments View
+Create View vAppointments As
+Select
+  AppointmentID
+  ,AppointmentDateTime
+  ,AppointmentPatientID
+  ,AppointmentDoctorID
+  ,AppointmentClinicID
+From Appointments;
+go
+
+-- CREATE REPORTING VIEW --------------------------------------------------------------------------
+
+-- Appointments by Patients, Doctors, and Clinics
+Create View vAppointmentsByPatientsDoctorsAndClinics As
+Select
+  AppointmentID
+  ,AppointmentDate = Format(AppointmentDateTime, 'd', 'en-US')
+  ,AppointmentTime = Format(cast(AppointmentDateTime as time), N'hh\:mm')
+  ,PatientID
+  ,PatientName = PatientFirstName + ' ' + PatientLastName
+  ,PatientPhoneNumber
+  ,PatientAddress
+  ,PatientCity
+  ,PatientState
+  ,PatientZipCode
+  ,DoctorID
+  ,DoctorName = DoctorFirstName + ' ' + DoctorLastName
+  ,DoctorPhoneNumber
+  ,DoctorAddress
+  ,DoctorCity
+  ,DoctorState
+  ,DoctorZipCode
+  ,ClinicID
+  ,ClinicName
+  ,ClinicPhoneNumber
+  ,ClinicAddress
+  ,ClinicCity
+  ,ClinicState
+  ,ClinicZipCode
+From Appointments as a
+  Join Patients as p
+  On a.AppointmentPatientID = p.PatientID
+  Join Doctors as d
+  On a.AppointmentDoctorID = d.DoctorID
+  Join Clinics as c
+  On a.AppointmentClinicID = c.ClinicID;
+go
+
+-- Test Views and Reporting View
+/*
+Select * From vClinics;
+Select * From vPatients;
+Select * From vDoctors;
+Select * From vAppointments;
+Select * From vAppointmentsByPatientsDoctorsAndClinics;
+*/
+
+-- CREATE STORED PROCEDURES -----------------------------------------------------------------------
+
+-- Clinics Sprocs
+Create Procedure pInsClinics (
+        @ClinicName nVarchar(100)
+       ,@ClinicPhoneNumber nVarchar(100)
+       ,@ClinicAddress nVarchar(100)
+       ,@ClinicCity nVarchar(100)
+       ,@ClinicState nchar(2)
+       ,@ClinicZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Insert Into Clinics Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Insert Into Clinics(
+        ClinicName
+       ,ClinicPhoneNumber
+       ,ClinicAddress
+       ,ClinicCity
+       ,ClinicState
+       ,ClinicZipCode
+	   ) 
+	Values(
+        @ClinicName
+       ,@ClinicPhoneNumber
+       ,@ClinicAddress
+       ,@ClinicCity
+       ,@ClinicState
+       ,@ClinicZipCode
+	   );
+   Commit Transaction
+   Set @RC = +@@IDENTITY -- Output captures newly created AutoID
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -@@IDENTITY
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pUpdClinics (
+        @ClinicID int
+       ,@ClinicName nVarchar(100)
+       ,@ClinicPhoneNumber nVarchar(100)
+       ,@ClinicAddress nVarchar(100)
+       ,@ClinicCity nVarchar(100)
+       ,@ClinicState nchar(2)
+       ,@ClinicZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Updates Clinics Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Update Clinics
+	Set  ClinicName		   = @ClinicName		  
+        ,ClinicPhoneNumber = @ClinicPhoneNumber
+        ,ClinicAddress	   = @ClinicAddress	  
+        ,ClinicCity		   = @ClinicCity		  
+        ,ClinicState	   = @ClinicState	  
+        ,ClinicZipCode	   = @ClinicZipCode	  
+	Where ClinicID = @ClinicID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pDelClinics (
+        @ClinicID int
+       )
+/* Author: <AKannadaguli>
+** Desc: Processes <Delete From Clinics Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Delete From Appointments Where AppointmentClinicID = @ClinicID;
+    Delete From Clinics Where ClinicID = @ClinicID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+-- Patients Sprocs
+Create Procedure pInsPatients (
+        @PatientFirstName nVarchar(100)
+       ,@PatientLastName nVarchar(100)
+       ,@PatientPhoneNumber nVarchar(100)
+       ,@PatientAddress nVarchar(100)
+       ,@PatientCity nVarchar(100)
+       ,@PatientState nchar(2)
+       ,@PatientZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Insert Into Patients Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Insert Into Patients(
+        PatientFirstName
+       ,PatientLastName
+       ,PatientPhoneNumber
+       ,PatientAddress
+       ,PatientCity
+       ,PatientState
+       ,PatientZipCode
+	   ) 
+	Values(
+         @PatientFirstName
+        ,@PatientLastName
+        ,@PatientPhoneNumber
+        ,@PatientAddress
+        ,@PatientCity
+        ,@PatientState
+        ,@PatientZipCode
+	   );
+   Commit Transaction
+   Set @RC = +@@IDENTITY -- Output captures newly created AutoID
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -@@IDENTITY
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pUpdPatients (
+        @PatientID int
+       ,@PatientFirstName nVarchar(100)
+       ,@PatientLastName nVarchar(100)
+       ,@PatientPhoneNumber nVarchar(100)
+       ,@PatientAddress nVarchar(100)
+       ,@PatientCity nVarchar(100)
+       ,@PatientState nchar(2)
+       ,@PatientZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Updates Patients Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Update Patients
+	Set  PatientFirstName	= @PatientFirstName	
+        ,PatientLastName	= @PatientLastName	
+        ,PatientPhoneNumber = @PatientPhoneNumber 
+        ,PatientAddress		= @PatientAddress		
+        ,PatientCity		= @PatientCity		
+        ,PatientState		= @PatientState		
+        ,PatientZipCode		= @PatientZipCode		
+	Where PatientID = @PatientID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pDelPatients (
+        @PatientID int
+       )
+/* Author: <AKannadaguli>
+** Desc: Processes <Delete From Patients Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Delete From Appointments Where AppointmentPatientID = @PatientID;
+    Delete From Patients Where PatientID = @PatientID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+-- Doctors Sprocs
+Create Procedure pInsDoctors (
+        @DoctorFirstName nVarchar(100)
+       ,@DoctorLastName nVarchar(100)
+       ,@DoctorPhoneNumber nVarchar(100)
+       ,@DoctorAddress nVarchar(100)
+       ,@DoctorCity nVarchar(100)
+       ,@DoctorState nchar(2)
+       ,@DoctorZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Insert Into Doctors Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Insert Into Doctors(
+        DoctorFirstName
+       ,DoctorLastName
+       ,DoctorPhoneNumber
+       ,DoctorAddress
+       ,DoctorCity
+       ,DoctorState
+       ,DoctorZipCode
+	   ) 
+	Values(
+         @DoctorFirstName
+        ,@DoctorLastName
+        ,@DoctorPhoneNumber
+        ,@DoctorAddress
+        ,@DoctorCity
+        ,@DoctorState
+        ,@DoctorZipCode
+	   );
+   Commit Transaction
+   Set @RC = +@@IDENTITY -- Output captures newly created AutoID
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -@@IDENTITY
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pUpdDoctors (
+        @DoctorID int
+       ,@DoctorFirstName nVarchar(100)
+       ,@DoctorLastName nVarchar(100)
+       ,@DoctorPhoneNumber nVarchar(100)
+       ,@DoctorAddress nVarchar(100)
+       ,@DoctorCity nVarchar(100)
+       ,@DoctorState nchar(2)
+       ,@DoctorZipCode nVarchar(10)
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Updates Doctors Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Update Doctors
+	Set  DoctorFirstName	= @DoctorFirstName	
+        ,DoctorLastName		= @DoctorLastName	
+        ,DoctorPhoneNumber	= @DoctorPhoneNumber 
+        ,DoctorAddress		= @DoctorAddress		
+        ,DoctorCity			= @DoctorCity		
+        ,DoctorState		= @DoctorState		
+        ,DoctorZipCode		= @DoctorZipCode		
+	Where DoctorID = @DoctorID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pDelDoctors (
+        @DoctorID int
+       )
+/* Author: <AKannadaguli>
+** Desc: Processes <Delete From Doctors Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Delete From Appointments Where AppointmentDoctorID = @DoctorID;
+    Delete From Doctors Where DoctorID = @DoctorID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+-- Appointment Sprocs
+Create Procedure pInsAppointments (
+        @AppointmentDateTime datetime
+       ,@AppointmentPatientID int
+       ,@AppointmentDoctorID int
+       ,@AppointmentClinicID int
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Insert Into Appointments Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Insert Into Appointments(
+        AppointmentDateTime
+       ,AppointmentPatientID
+       ,AppointmentDoctorID
+       ,AppointmentClinicID
+	   ) 
+	Values(
+        @AppointmentDateTime
+       ,@AppointmentPatientID
+       ,@AppointmentDoctorID
+       ,@AppointmentClinicID
+	   );
+   Commit Transaction
+   Set @RC = +@@IDENTITY -- Output captures newly created AutoID
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -@@IDENTITY
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pUpdAppointments (
+        @AppointmentID int
+       ,@AppointmentDateTime datetime
+       ,@AppointmentPatientID int
+       ,@AppointmentDoctorID int
+       ,@AppointmentClinicID int
+	   )
+/* Author: <AKannadaguli>
+** Desc: Processes <Updates Appointments Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Update Appointments
+	Set  AppointmentDateTime  = @AppointmentDateTime 
+        ,AppointmentPatientID = @AppointmentPatientID
+        ,AppointmentDoctorID  = @AppointmentDoctorID 
+        ,AppointmentClinicID  = @AppointmentClinicID
+	Where AppointmentID = @AppointmentID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+Create Procedure pDelAppointments (
+        @AppointmentID int
+       )
+/* Author: <AKannadaguli>
+** Desc: Processes <Delete From Appointments Table>
+** Change Log: When,Who,What
+** <2020-06-11>,<AKannadaguli>,Created stored procedure.
+*/
+AS
+ Begin
+  Declare @RC int = 0;
+  Begin Try
+   Begin Transaction 
+    Delete From Appointments Where AppointmentID = @AppointmentID;
+   Commit Transaction
+   Set @RC = +1
+  End Try
+  Begin Catch
+   If(@@Trancount > 0) Rollback Transaction
+   Print Error_Message()
+   Set @RC = -1
+  End Catch
+  Return @RC;
+ End
+go
+
+-- TEST STORED PROCEDURES -------------------------------------------------------------------------
+
+-- Test Insert Sprocs
+Declare @Status int; -- store return code ------------------ Insert Clinic
+Exec @Status = pInsClinics 
+        @ClinicName		   = 'Shorty Had Them'
+       ,@ClinicPhoneNumber = '123-456-7890'
+       ,@ClinicAddress	   = '1234 SE 56th St'
+       ,@ClinicCity		   = 'Applebottom Jeans'
+       ,@ClinicState	   = 'WA'
+       ,@ClinicZipCode	   = '98075'
+	   ;
+If @Status > 0 -- output feedback
+Begin   -- Cannot use Select Case for Insert Sprocs because Output is +/- AutoID, not necessarily +/- 1
+  Select 'Clinic insert test was successful!'
+End
+If @Status < 0 
+Begin
+  Select 'Clinic insert test failed! Common Issues: Duplicate Data'
+End
+go
+Select * From Clinics; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Insert Patient
+Exec @Status = pInsPatients 
+        @PatientFirstName	= 'Boots With'
+       ,@PatientLastName	= 'The Fur'
+       ,@PatientPhoneNumber	= '456-234-6495'
+       ,@PatientAddress		= '2345 SE 45th St'
+       ,@PatientCity		= 'With The Fur'
+       ,@PatientState		= 'WA'
+       ,@PatientZipCode		= '12345'
+	   ;
+If @Status > 0 -- output feedback
+Begin   -- Cannot use Select Case for Insert Sprocs because Output is +/- AutoID, not necessarily +/- 1
+  Select 'Patient insert test was successful!'
+End
+If @Status < 0 
+Begin
+  Select 'Patient insert test failed! Common Issues: Duplicate Data'
+End
+Select * From Patients; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Insert Doctor
+Exec @Status = pInsDoctors 
+        @DoctorFirstName	= 'The Whole'
+       ,@DoctorLastName		= 'Club Was'
+       ,@DoctorPhoneNumber	= '123-456-7890'
+       ,@DoctorAddress		= '1234 NE 76th St'
+       ,@DoctorCity			= 'Lookin At Her'
+       ,@DoctorState		= 'WA'
+       ,@DoctorZipCode		= '12345'
+	   ;
+If @Status > 0 -- output feedback
+Begin   -- Cannot use Select Case for Insert Sprocs because Output is +/- AutoID, not necessarily +/- 1
+  Select 'Doctor insert test was successful!'
+End
+If @Status < 0 
+Begin
+  Select 'Doctor insert test failed! Common Issues: Duplicate Data'
+End
+Select * From Doctors; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Insert Appointment
+Exec @Status = pInsAppointments 
+        @AppointmentDateTime  = 'Feb 18 2017 10:03AM'
+       ,@AppointmentPatientID = 1
+       ,@AppointmentDoctorID  = 1
+       ,@AppointmentClinicID  = 1
+	   ;
+If @Status > 0 -- output feedback
+Begin   -- Cannot use Select Case for Insert Sprocs because Output is +/- AutoID, not necessarily +/- 1
+  Select 'Appointment insert test was successful!'
+End
+If @Status < 0 
+Begin
+  Select 'Appointment insert test failed! Common Issues: Duplicate Data'
+End
+Select * From Appointments; -- check table
+go
+
+-- Test Update Sprocs
+Declare @Status int; -- store return code ------------------ Update Clinic
+Exec @Status = pUpdClinics 
+        @ClinicID = 1
+	   ,@ClinicName		   = 'She Hit'
+       ,@ClinicPhoneNumber = '098-765-4321'
+       ,@ClinicAddress	   = '5678 SE 90th St'
+       ,@ClinicCity		   = 'The Floor'
+       ,@ClinicState	   = 'CA'
+       ,@ClinicZipCode	   = '90210'
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Clinic update test was successful!'
+  When -1 Then 'Clinic update test failed! Common Issues: Duplicate Data, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Clinics; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Update Patient
+Exec @Status = pUpdPatients 
+        @PatientID = 1
+	   ,@PatientFirstName	= 'Next Thing'
+       ,@PatientLastName	= 'You Know'
+       ,@PatientPhoneNumber	= '746-283-8392'
+       ,@PatientAddress		= '8765 NE 84th St'
+       ,@PatientCity		= 'Shorty Got'
+       ,@PatientState		= 'CA'
+       ,@PatientZipCode		= '54321'
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Patient update test was successful!'
+  When -1 Then 'Patient update test failed! Common Issues: Duplicate Data, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Patients; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Update Doctor
+Exec @Status = pUpdDoctors 
+        @DoctorID = 1
+	   ,@DoctorFirstName	= 'Low Low Low'
+       ,@DoctorLastName		= 'Low Low'
+       ,@DoctorPhoneNumber	= '098-765-4321'
+       ,@DoctorAddress		= '5678 NE 84th St'
+       ,@DoctorCity			= 'Low Low Low'
+       ,@DoctorState		= 'CA'
+       ,@DoctorZipCode		= '54321'
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Doctor update test was successful!'
+  When -1 Then 'Doctor update test failed! Common Issues: Duplicate Data, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Doctors; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Update Appointment
+Exec @Status = pUpdAppointments 
+        @AppointmentID = 1
+	   ,@AppointmentDateTime  = 'Jun 11 2020 01:26PM'
+       ,@AppointmentPatientID = 1
+       ,@AppointmentDoctorID  = 1
+       ,@AppointmentClinicID  = 1
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Appointment update test was successful!'
+  When -1 Then 'Appointment update test failed! Common Issues: Duplicate Data'
+  End 
+As [Status]
+go
+Select * From Appointments; -- check table
+go
+
+
+-- Test Delete Sprocs
+Declare @Status int; -- store return code ------------------ Delete Appointment
+Exec @Status = pDelAppointments
+        @AppointmentID = 1
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Appointment deletion test was successful!'
+  When -1 Then 'Appointment deletion test failed! Inputed ID does not exist, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Appointments; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Delete Clinic
+Exec @Status = pDelClinics 
+        @ClinicID = 1
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Clinic deletion test was successful!'
+  When -1 Then 'Clinic deletion test failed! Inputed ID does not exist, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Clinics; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Delete Patient
+Exec @Status = pDelPatients 
+        @PatientID = 1
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Patient deletion test was successful!'
+  When -1 Then 'Patient deletion test failed! Inputed ID does not exist, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Patients; -- check table
+go
+
+Declare @Status int; -- store return code ------------------ Delete Doctor
+Exec @Status = pDelDoctors 
+        @DoctorID = 1
+	   ;
+Select Case @Status -- output feedback
+  When +1 Then 'Doctor deletion test was successful!'
+  When -1 Then 'Doctor deletion test failed! Inputed ID does not exist, Foreign Key Constraint'
+  End 
+As [Status]
+go
+Select * From Doctors; -- check table
+go
+
+-- SET PERMISSIONS --------------------------------------------------------------------------------
+
+-- -- Denying public access of any kind to database tables
+Deny Select, Insert, Update, Delete on Clinics to Public;
+Deny Select, Insert, Update, Delete on Patients to Public;
+Deny Select, Insert, Update, Delete on Doctors to Public;
+Deny Select, Insert, Update, Delete on Appointments to Public;
+go
+
+-- Granting public access to views
+Grant Select on Clinics to Public;
+Grant Select on Patients to Public;
+Grant Select on Doctors to Public;
+Grant Select on Appointments to Public;
+go
+
+-- Granting public access to reporting view
+Grant Select on vAppointmentsByPatientsDoctorsAndClinics to Public;
+go
+
+-- Granting public access to Clinics Sprocs
+Grant Execute on pInsClinics to Public;
+Grant Execute on pUpdClinics to Public;
+Grant Execute on pDelClinics to Public;
+go
+
+-- Granting public access to Patients Sprocs
+Grant Execute on pInsPatients to Public;
+Grant Execute on pUpdPatients to Public;
+Grant Execute on pDelPatients to Public;
+go
+
+-- Granting public access to Doctors Sprocs
+Grant Execute on pInsDoctors to Public;
+Grant Execute on pUpdDoctors to Public;
+Grant Execute on pDelDoctors to Public;
+go
+
+-- Granting public access to Appointments Sprocs
+Grant Execute on pInsAppointments to Public;
+Grant Execute on pUpdAppointments to Public;
+Grant Execute on pDelAppointments to Public;
+go

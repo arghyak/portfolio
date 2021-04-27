@@ -1,0 +1,100 @@
+--**********************************************************************************************--
+-- Title: INFO 330 Final Milestone 02
+-- Author: AKannadaguli
+-- Desc: Import Script for Patient Appointment DB
+-- Change Log: When,Who,What
+-- 2020-06-12,AKannadaguli,Created File
+--***********************************************************************************************--
+
+-------------------------------------- NOTE FROM THE AUTHOR ---------------------------------------
+
+-- This script creates the following views:
+  -- vPatientsByDoctor: Which Doctors are seeing which Patients?
+  -- vDoctorsByClinic: Which Doctors work at each Clinic?
+  -- vClinicsDoctorsAndPatientsByAppointmentDateAndTime: Appointment details by date and time (read: Appointment Schedule)
+  -- vClinicByCity: What city is each clinic in?
+---------------------------------------------------------------------------------------------------
+
+Use Master;
+go
+Use Assignment08DB_AKannadaguli;
+go
+
+-- CREATE VIEWS -----------------------------------------------------------------------------------
+
+Create View vPatientsByDoctor As
+Select 
+  DoctorID
+  ,DoctorName = DoctorFirstName + ' ' + DoctorLastName
+  ,PatientID
+  ,PatientName = PatientFirstName + ' ' + PatientLastName
+From Appointments as a
+  Join Patients as p
+  On a.AppointmentPatientID = p.PatientID
+  Join Doctors as d
+  On a.AppointmentDoctorID = d.DoctorID;
+go
+
+Create View vDoctorsByClinic As
+Select 
+  ClinicID
+  ,ClinicName
+  ,DoctorID
+  ,DoctorName = DoctorFirstName + ' ' + DoctorLastName
+From Appointments as a
+  Join Clinics as c
+  On a.AppointmentClinicID = c.ClinicID
+  Join Doctors as d
+  On a.AppointmentDoctorID = d.DoctorID;
+go
+
+Create View vClinicsDoctorsAndPatientsByAppointmentDateAndTime As
+Select 
+  AppointmentDate = Format(AppointmentDateTime, 'd', 'en-US')
+  ,AppointmentTime = Format(cast(AppointmentDateTime as time), N'hh\:mm')
+  ,ClinicID
+  ,ClinicName
+  ,DoctorID
+  ,DoctorName = DoctorFirstName + ' ' + DoctorLastName
+  ,PatientID
+  ,PatientName = DoctorFirstName + ' ' + DoctorLastName
+From Appointments as a
+  Join Clinics as c
+  On a.AppointmentClinicID = c.ClinicID
+  Join Patients as p
+  On a.AppointmentPatientID = p.PatientID
+  Join Doctors as d
+  On a.AppointmentDoctorID = d.DoctorID;
+go
+
+Create View vClinicByCity As
+Select
+  ClinicID
+  ,ClinicName
+  ,ClinicCity
+  ,ClinicState
+From Clinics;
+go
+
+
+-- SELECT VIEWS -----------------------------------------------------------------------------------
+Select * From vPatientsByDoctor;
+Select * From vDoctorsByClinic;
+Select * From vClinicsDoctorsAndPatientsByAppointmentDateAndTime;
+Select * From vClinicByCity;
+go
+
+-- SET PERMISSIONS --------------------------------------------------------------------------------
+Grant Select on vPatientsByDoctor to Public;
+Grant Select on vDoctorsByClinic to Public;
+Grant Select on vClinicsDoctorsAndPatientsByAppointmentDateAndTime to Public;
+Grant Select on vClinicByCity to Public;
+go
+
+-- DROP VIEWS -------------------------------------------------------------------------------------
+-- un-comment this section to be able to run script repeatedly
+Drop View vPatientsByDoctor;
+Drop View vDoctorsByClinic;
+Drop View vClinicsDoctorsAndPatientsByAppointmentDateAndTime;
+Drop View vClinicByCity;
+go

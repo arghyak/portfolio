@@ -1,0 +1,187 @@
+--**********************************************************************************************--
+-- Title: INFO 330 Final Milestone 02
+-- Author: AKannadaguli
+-- Desc: Import Script for Patient Appointment DB
+-- Change Log: When,Who,What
+-- 2020-06-12,AKannadaguli,Created File
+--***********************************************************************************************--
+
+-------------------------------------- NOTE FROM THE AUTHOR ---------------------------------------
+
+-- Sample data from mockaroo.com
+
+-- When this script runs, it will output the following:
+  -- Clinic Table with sample values
+  -- Patients Table with sample values
+  -- Doctors Table with sample values
+  -- Appointments Table with sample values
+
+-- Must run "Assignment08-Milestone02.sql" script first so that DB exists
+  -- I googled "how to run one sql script from another script" but it looked too hard/confusing, 
+  -- something about "r:"? Anyways, this is not the hill I want to die on so I gave up.
+---------------------------------------------------------------------------------------------------
+
+
+Use Master; 
+go
+Use Assignment08DB_AKannadaguli;
+go
+
+-- CLEAR TABLES ----------------------------------------------------------------------------------
+Delete From Appointments;
+Delete From Clinics;
+Delete From Patients;
+Delete From Doctors;
+go
+
+-- INSERT SAMPLE DATA ----------------------------------------------------------------------------
+
+-- Create Temp Table to keep track of Clinic/Patient/Doctor IDs so that we can use them in the 
+-- Appointments Table. Can't hard code IDs in Appointments Table because what if I want to run 
+-- this script over and over again without re-implementing the DB, the IDs will change every time
+Create Table IDTracker(
+   RowNum int Identity(1,1) -- there will only be one row but I think that having the "RowNum"
+                            -- column will make it easier to access it
+  ,MinClinicID int
+  ,MaxClinicID int
+  ,MinPatientID int
+  ,MaxPatientID int
+  ,MinDoctorID int
+  ,MaxDoctorID int
+);
+go
+
+-- Insert Into Clinics Table
+Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Beer, Mosciski and Steuber', '480-682-4536', '6838 Lyons Center', 'Gilbert', 'AZ', '85297');
+Insert Into IDTracker (MinClinicID) Values (@@IDENTITY); -- update ID Tracker Table
+Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Herman Group', '510-308-1430', '1 Ilene Lane', 'Oakland', 'CA', '94611');
+Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Wilderman, Greenholt and Daugherty', '609-491-9003', '2 Bluejay Road', 'Trenton', 'NJ', '08608');
+Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Daniel Group', '772-329-0792', '97274 Pepper Wood Court', 'West Palm Beach', 'FL', '33405');
+Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Botsford, Langworth and Barrows', '215-743-7125', '76 Hoepker Hill', 'Philadelphia', 'PA', '19093');
+--Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Upton-Christiansen', '719-574-6491', '38 Elka Junction', 'Colorado Springs', 'CO', '80930');
+--Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Schneider, Reichert and Cronin', '918-555-0496', '57 Mifflin Crossing', 'Tulsa', 'OK', '74170');
+--Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Crist Inc', '619-925-4276', '30 Clyde Gallagher Point', 'San Diego', 'CA', '92115');
+--Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Lynch, Mraz and Mills', '718-514-1838', '88 Lerdahl Street', 'New York City', 'NY', '10014');
+--Insert Into Clinics (ClinicName, ClinicPhoneNumber, ClinicAddress, ClinicCity, ClinicState, ClinicZipCode) Values ('Moore-Abbott', '310-959-9702', '45808 Continental Hill', 'Santa Monica', 'CA', '90410');
+Update IDTracker Set MaxClinicID = @@IDENTITY Where RowNum = 1; -- update ID Tracker Table
+go
+
+-- Insert Into Patients Table
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Allene', 'Cobbe', '256-207-4865', '58044 Kings Avenue', 'Huntsville', 'AL', '35895');
+Update IDTracker Set MinPatientID = @@IDENTITY Where RowNum = 1; -- update ID Tracker Table
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Ruddy', 'Desbrow', '786-730-1818', '3542 Arrowood Hill', 'Homestead', 'FL', '33034');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Joelly', 'Silverman', '719-616-2069', '93818 Forster Junction', 'Pueblo', 'CO', '81010');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Mandi', 'Andriss', '563-428-9568', '60 Sycamore Park', 'Davenport', 'IA', '52809');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Sophey', 'Richardeau', '915-565-0302', '35525 Forest Dale Circle', 'El Paso', 'TX', '88535');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Caresa', 'Pocknoll', '317-570-8080', '99283 6th Point', 'Indianapolis', 'IN', '46266');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Fabio', 'Crockatt', '704-785-2603', '3 Karstens Road', 'Charlotte', 'NC', '28272');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Christabel', 'Cruces', '704-887-8634', '8 Marquette Way', 'Gastonia', 'NC', '28055');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Charmaine', 'Normanville', '205-602-0903', '96714 Pond Court', 'Birmingham', 'AL', '35254');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Sharai', 'Drance', '704-429-2340', '2438 La Follette Parkway', 'Charlotte', 'NC', '28278');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Leena', 'Plumstead', '940-393-0927', '8125 Milwaukee Circle', 'Wichita Falls', 'TX', '76310');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Bartholomeus', 'Ousby', '772-591-7965', '7 Atwood Avenue', 'Fort Pierce', 'FL', '34949');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Romona', 'Pflieger', '316-553-7385', '2146 School Lane', 'Wichita', 'KS', '67215');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Amos', 'Fermin', '571-817-6157', '3228 Ryan Lane', 'Reston', 'VA', '22096');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Sheelah', 'Verrillo', '785-457-3241', '4 Grasskamp Crossing', 'Topeka', 'KS', '66611');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Esteban', 'Windless', '913-765-4627', '4 Nova Plaza', 'Shawnee Mission', 'KS', '66215');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Margo', 'Mattingson', '770-119-5647', '2 Melody Avenue', 'Atlanta', 'GA', '30340');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Norean', 'Beadman', '843-770-2224', '344 Algoma Plaza', 'Beaufort', 'SC', '29905');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Dell', 'Condy', '559-903-3196', '72896 Stoughton Avenue', 'Fullerton', 'CA', '92640');
+Insert Into Patients (PatientFirstName, PatientLastName, PatientPhoneNumber, PatientAddress, PatientCity, PatientState, PatientZipCode) Values ('Mandy', 'Teare', '706-317-2117', '656 Linden Circle', 'Cumming', 'GA', '30130');
+Update IDTracker Set MaxPatientID = @@IDENTITY Where RowNum = 1; -- update ID Tracker Table
+go
+
+-- Insert Into Doctors Table
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Beatrice', 'Dowrey', '954-409-5006', '52285 Stephen Court', 'Fort Lauderdale', 'FL', '33325');
+Update IDTracker Set MinDoctorID = @@IDENTITY Where RowNum = 1; -- update ID Tracker Table
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Elihu', 'Linning', '973-354-8402', '61 Walton Terrace', 'Newark', 'NJ', '07104');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Jaclyn', 'Armsby', '952-869-2836', '2 Dennis Alley', 'Young America', 'MN', '55564');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Mallissa', 'Liston', '503-462-7863', '92 Carey Lane', 'Portland', 'OR', '97296');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Izabel', 'Darrigoe', '352-787-4276', '80706 Moose Trail', 'Ocala', 'FL', '34479');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Lorene', 'Sandhill', '203-793-2452', '8 Maple Wood Plaza', 'Bridgeport', 'CT', '06606');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Lorrayne', 'Whitfield', '215-701-7107', '6571 Washington Lane', 'Philadelphia', 'PA', '19131');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Kippy', 'Logsdail', '719-359-6792', '791 Larry Point', 'Colorado Springs', 'CO', '80951');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Danice', 'Redington', '586-438-4821', '4132 Prairieview Hill', 'Detroit', 'MI', '48211');
+Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Derrik', 'Guion', '601-322-7143', '64 Manufacturers Center', 'Jackson', 'MS', '39216');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Rayna', 'Ekell', '202-538-6423', '0233 Cambridge Pass', 'Washington', 'DC', '20036');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Sasha', 'McKeaney', '785-385-5651', '96 Di Loreto Parkway', 'Topeka', 'KS', '66629');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Shelli', 'Sparhawk', '615-885-8143', '017 Mendota Alley', 'Nashville', 'TN', '37240');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Ellissa', 'Mewitt', '208-411-3288', '687 Clemons Plaza', 'Idaho Falls', 'ID', '83405');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Finley', 'MacCollom', '203-149-2749', '60340 Annamark Court', 'New Haven', 'CT', '06505');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Shawn', 'Hyrons', '325-737-8772', '4837 Charing Cross Terrace', 'Abilene', 'TX', '79605');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Kalila', 'Behnen', '832-225-1922', '08 Rutledge Pass', 'Houston', 'TX', '77030');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Rita', 'Haslum', '312-749-5633', '5 Surrey Alley', 'Chicago', 'IL', '60691');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Alva', 'Shurmore', '619-500-6422', '77 Grasskamp Crossing', 'San Diego', 'CA', '92191');
+-- Insert Into Doctors (DoctorFirstName, DoctorLastName, DoctorPhoneNumber, DoctorAddress, DoctorCity, DoctorState, DoctorZipCode) Values ('Marris', 'Mosdell', '315-151-5922', '45598 Hermina Alley', 'Utica', 'NY', '13505');
+Update IDTracker Set MaxDoctorID = @@IDENTITY Where RowNum = 1; -- update ID Tracker Table
+go
+
+-- Insert Into Appointments Table
+-- Using this method because I'm only working with a small data set, and because I want
+-- to be able to run this script over and over 
+
+-- Temp store sample datetime values
+Create Table SampleDateTimes(
+  RowNum int Identity(1,1)
+  ,AppointmentDateTime datetime
+);
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-15 07:53:50');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-14 05:04:48');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-19 09:38:35');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-21 20:07:30');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-24 04:56:02');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-19 00:55:37');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-14 12:28:48');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-23 01:49:09');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-15 17:12:29');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-22 23:44:36');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-22 14:27:12');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-21 10:26:15');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-14 04:21:56');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-23 22:55:04');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-15 14:28:53');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-22 02:02:01');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-22 15:23:46');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-24 17:28:08');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-12 13:51:06');
+Insert Into SampleDateTimes (AppointmentDateTime) Values ('2020-06-23 17:52:19');
+
+
+-- Variables to use in while loop below
+Declare @MinPatientID int = (Select MinPatientID From IDTracker Where RowNum = 1);
+Declare @MaxPatientID int = (Select MaxPatientID From IDTracker Where RowNum = 1);
+Declare @MinDoctorID int = (Select MinDoctorID From IDTracker Where RowNum = 1);
+Declare @MaxDoctorID int = (Select MaxDoctorID From IDTracker Where RowNum = 1);
+Declare @MinClinicID int = (Select MinClinicID From IDTracker Where RowNum = 1);
+Declare @MaxClinicID int = (Select MaxClinicID From IDTracker Where RowNum = 1);
+
+Declare @AppointmentDateTime datetime;
+Declare @AppointmentPatientID int;
+Declare @AppointmentDoctorID int;
+Declare @AppointmentClinicID int;
+
+-- Iteratively populate Appointments Table
+Declare @cnt int = 1;
+While @cnt <= (Select Count(*) From SampleDateTimes)
+Begin
+   Select @AppointmentDateTime = AppointmentDateTime From SampleDateTimes Where RowNum = @cnt;
+   Set @AppointmentPatientID = Convert(int, RAND()*(@MaxPatientID-@MinPatientID)+@MinPatientID);
+   Set @AppointmentDoctorID  = Convert(int, RAND()*(@MaxDoctorID-@MinDoctorID)+@MinDoctorID);
+   Set @AppointmentClinicID  = Convert(int, RAND()*(@MaxClinicID-@MinClinicID)+@MinClinicID);
+
+   Insert Into Appointments (AppointmentDateTime, AppointmentPatientID, AppointmentDoctorID, AppointmentClinicID)
+   Values (@AppointmentDateTime, @AppointmentPatientID, @AppointmentDoctorID, @AppointmentClinicID);
+
+   Set @cnt = @cnt + 1;
+End
+
+-- Select All Tables to see whether the sample data's looking hot... or not
+Select * From Clinics;
+Select * From Patients;
+Select * From Doctors;
+Select * From Appointments;
+go -- Ok sis! Looking good!
+
+-- Get Rid of Temp Tables so I can run the script again without it being rude to me
+Drop Table IDTracker;
+Drop Table SampleDateTimes;
