@@ -6,7 +6,7 @@ Welcome! I'm in the process of setting this up, please excuse any errors.
 
 ## About Me
 
-My name is Arghya. I'm an undergrad at the University of Washington. I’m currently earning my B.A. in Geography Data Science, with minors in Informatics and Applied Math. I work part time as a Classical Indian Dance Instructor for the Anga Kala Kathak Academy, where I’ve been learning Kathak for the last ten years, and also volunteer for the Academy's two sister organizations. Outside of school and work, I lead two student organizations that I love very dearly: Plenum Undergraduate Journal for Geography Research and GeoDat Society for Geography Data Science. For more information about me and my story, visit [this link](leadership-journey.md).
+My name is Arghya. I'm an undergrad at the University of Washington. I’m currently earning my B.A. in Geography Data Science, with minors in Informatics and Applied Math. I work part time as a Classical Indian Dance Instructor for the Anga Kala Kathak Academy, where I’ve been learning Kathak for the last ten years, and also volunteer for the Academy's two sister organizations. Outside of school and work, I lead two student organizations that I love very dearly: Plenum Undergraduate Journal for Geography Research and GeoDat Society for Geography Data Science. For more information about me and my story, visit [this link](about-me/leadership-essay.md).
 
 ## Contact
 
